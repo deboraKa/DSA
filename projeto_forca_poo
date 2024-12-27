@@ -200,4 +200,4 @@ class Forca:
 if __name__ == "__main__":
     jogo = Forca()
     jogo.jogar()
-    print("\nParabéns. Você está aprendendo programação em Python com a DSA. :)")
+   
