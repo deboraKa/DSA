@@ -1,0 +1,203 @@
+import random
+from os import system, name
+
+# Função para limpar a tela a cada execução
+def limpa_tela():
+    if name == 'nt':
+        _ = system('cls')
+    else:
+        _ = system('clear')
+
+# Classe para a representação do tabuleiro
+class Tabuleiro:
+    def __init__(self, palavra):
+        self.palavra = palavra
+        self.tabuleiro = ["_"] * len(palavra)
+
+    def mostrar(self):
+        print("Palavra: ", " ".join(self.tabuleiro))
+
+    def atualizar(self, letra, indices):
+        for indice in indices:
+            self.tabuleiro[indice] = letra
+
+    def completo(self):
+        return "_" not in self.tabuleiro
+
+# Classe para a lógica do jogo da forca
+class Forca:
+    def __init__(self):
+        self.palavras_com_dicas = {
+            1: {
+                'gato': ["É um animal", "Tem bigodes", "Adora caçar ratos"],
+                'casa': ["É um lugar", "Serve como abrigo", "Pode ter muitos cômodos"],
+                'bola': ["É redonda", "Usada em esportes", "Pode ser de futebol"]
+            },
+            2: {
+                'abacate': ["É verde por fora", "Tem uma grande semente", "Usado para guacamole"],
+                'morango': ["É vermelho", "Tem sementes na superfície", "Usado em sobremesas"],
+                'banheiro': ["É um cômodo", "Tem pia e vaso sanitário", "Usado para higiene"]
+            },
+            3: {
+                'astronauta': ["Viaja pelo espaço", "Usa um traje especial", "Trabalha em uma nave espacial"],
+                'helicóptero': ["Pode voar", "Tem hélices", "Usado em resgates"],
+                'turbulência': ["É sentida em aviões", "Pode causar medo", "Ocorre em áreas de instabilidade"]
+            }
+        }
+        self.dicas_usadas = 0
+        self.chances = 6
+        self.letras_tentativas = []
+        self.letras_erradas = []  # Lista para armazenar as letras erradas
+
+    def escolher_palavra(self, nivel):
+        palavras_nivel = self.palavras_com_dicas[nivel]
+        palavra = random.choice(list(palavras_nivel.keys()))
+        dicas = palavras_nivel[palavra]
+        return palavra, dicas
+
+    def display_hangman(self):
+        stages = [
+            """
+               --------
+               |      |
+               |      O
+               |     \\|/
+               |      |
+               |     / \\
+               -
+            """,
+            """
+               --------
+               |      |
+               |      O
+               |     \\|/
+               |      |
+               |     / 
+               -
+            """,
+            """
+               --------
+               |      |
+               |      O
+               |     \\|/
+               |      |
+               |      
+               -
+            """,
+            """
+               --------
+               |      |
+               |      O
+               |     \\|
+               |      |
+               |      
+               -
+            """,
+            """
+               --------
+               |      |
+               |      O
+               |      |
+               |      |
+               |      
+               -
+            """,
+            """
+               --------
+               |      |
+               |      O
+               |      
+               |      
+               |      
+               -
+            """,
+            """
+               --------
+               |      |
+               |      
+               |      
+               |      
+               |      
+               -
+            """
+        ]
+        print(stages[self.chances])
+
+    def pedir_dica(self, dicas):
+        if self.dicas_usadas < 3:
+            print(f"Dica {self.dicas_usadas + 1}: {dicas[self.dicas_usadas]}")
+            self.dicas_usadas += 1
+            self.chances -= 1
+        else:
+            print("Você já usou todas as suas dicas!")
+
+    def jogar(self):
+        while True:
+            limpa_tela()
+            print("\nBem-vindo ao jogo da forca!")
+            print("Escolha um nível de dificuldade: 1 - Fácil, 2 - Médio, 3 - Difícil\n")
+
+            try:
+                nivel = input("Digite o número do nível desejado: ")
+                if nivel not in ['1', '2', '3']:
+                    raise ValueError("Nível inválido, por favor escolha 1, 2 ou 3.")
+                nivel = int(nivel)
+            except ValueError as e:
+                print(f"Erro: {e}")
+                continue
+
+            palavra, dicas = self.escolher_palavra(nivel)
+
+            tabuleiro = Tabuleiro(palavra)
+            while self.chances > 0:
+                self.display_hangman()
+                tabuleiro.mostrar()
+                print(f"Chances restantes: {self.chances}")
+                print(f"Dicas disponíveis: {3 - self.dicas_usadas}")
+                print(f"Letras erradas: {', '.join(self.letras_erradas)}\n")  # Exibe as letras erradas
+
+                escolha = input("Digite uma letra ou digite 'dica' para pedir uma dica: ").lower()
+
+                try:
+                    if escolha == 'dica':
+                        self.pedir_dica(dicas)
+                        continue
+
+                    if len(escolha) != 1 or not escolha.isalpha():
+                        raise ValueError("Por favor, digite apenas uma letra válida.")
+
+                    if escolha in self.letras_tentativas:
+                        raise ValueError("Você já tentou essa letra. Escolha outra!")
+
+                    self.letras_tentativas.append(escolha)
+
+                    if escolha in palavra:
+                        print("Você acertou a letra!")
+                        indices = [i for i, letra in enumerate(palavra) if letra == escolha]
+                        tabuleiro.atualizar(escolha, indices)
+
+                        if tabuleiro.completo():
+                            print(f"\nVocê venceu! A palavra era: {palavra}")
+                            break
+                    else:
+                        print("Ops. Essa letra não está na palavra!")
+                        self.chances -= 1
+                        self.letras_erradas.append(escolha)  # Adiciona a letra errada à lista
+
+                except ValueError as e:
+                    print(f"Erro: {e}")
+                    continue
+
+            if not tabuleiro.completo():
+                print(f"\nVocê perdeu! A palavra era: {palavra}.")
+
+            jogar_novamente = input("\nDeseja jogar novamente? (s/n): ").lower()
+            if jogar_novamente != 's':
+                print("\nObrigado por jogar! Até a próxima.")
+                break
+
+
+if __name__ == "__main__":
+    jogo = Forca()
+    jogo.jogar()
+    print("\nParabéns. Você está aprendendo programação em Python com a DSA. :)")
