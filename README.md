@@ -1,7 +1,3 @@
-Aqui está o README atualizado com todas as alterações realizadas no código, incluindo a implementação de orientação a objetos, exibição de letras erradas e o uso do bloco `try-except`:
-
----
-
 # Jogo da Forca em Python
 
 Este projeto é uma implementação do jogo da forca em Python utilizando Programação Orientada a Objetos (POO). O jogo oferece opções de níveis de dificuldade, permite o uso de dicas e exibe as letras erradas já tentadas, proporcionando uma experiência mais interativa e fluída.
@@ -134,7 +130,3 @@ Dica 1: É um animal
 ## Contribuições
 
 Contribuições são bem-vindas! Sinta-se à vontade para abrir uma *issue* ou enviar um *pull request*.
-
----
-
-Esse README reflete as modificações feitas no código, como o uso de POO, a adição das letras erradas e o uso do `try-except` para melhor gerenciamento de erros.
